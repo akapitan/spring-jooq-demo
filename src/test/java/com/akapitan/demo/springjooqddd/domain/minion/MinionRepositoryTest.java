@@ -49,4 +49,16 @@ class MinionRepositoryTest {
         .allMatch(x -> (x.getName().toLowerCase(Locale.ROOT).contains(MINION_NAME)));
   }
 
+  @Test
+  void save_givenMinion_returnSavedMinion() {
+    MinionRecord ivan = new MinionRecord(null, null, "Ivan", "2", null, null);
+    MinionRecord save = repository.save(ivan);
+
+    save.setName("ivan2");
+    save.setNumberOfEyes("3");
+    MinionRecord saveReloaded = repository.save(save);
+
+    System.out.println(saveReloaded);
+  }
+
 }
