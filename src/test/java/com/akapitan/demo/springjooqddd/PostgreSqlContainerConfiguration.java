@@ -6,12 +6,25 @@
 package com.akapitan.demo.springjooqddd;
 
 import com.zaxxer.hikari.HikariDataSource;
+import javax.sql.DataSource;
+import org.jooq.ConnectionProvider;
+import org.jooq.ExecuteListenerProvider;
+import org.jooq.impl.DataSourceConnectionProvider;
+import org.jooq.impl.DefaultConfiguration;
+import org.jooq.impl.DefaultDSLContext;
+import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.autoconfigure.jooq.DefaultConfigurationCustomizer;
+import org.springframework.boot.autoconfigure.jooq.JooqProperties;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
+import org.springframework.jdbc.datasource.TransactionAwareDataSourceProxy;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.jdbc.JdbcDatabaseDelegate;
 
 @TestConfiguration
+@EnableConfigurationProperties({JooqProperties.class})
 public class PostgreSqlContainerConfiguration {
 
   @Bean
@@ -33,4 +46,34 @@ public class PostgreSqlContainerConfiguration {
     return dataSource;
   }
 
+  @Bean
+  public DefaultDSLContext dslContext(org.jooq.Configuration configuration) {
+    return new DefaultDSLContext(configuration);
+  }
+
+  @Bean
+  @ConditionalOnMissingBean({org.jooq.Configuration.class})
+  public DefaultConfiguration jooqConfiguration(
+      JooqProperties properties, ConnectionProvider connectionProvider, DataSource dataSource,
+      ObjectProvider<ExecuteListenerProvider> executeListenerProviders,
+      ObjectProvider<DefaultConfigurationCustomizer> configurationCustomizers) {
+    DefaultConfiguration configuration = new DefaultConfiguration();
+    configuration.set(properties.determineSqlDialect(dataSource));
+    configuration.set(connectionProvider);
+    configuration.set(
+        (ExecuteListenerProvider[]) executeListenerProviders.orderedStream().toArray((x$0) -> {
+          return new ExecuteListenerProvider[x$0];
+        }));
+    configurationCustomizers.orderedStream().forEach((customizer) -> {
+      customizer.customize(configuration);
+    });
+    return configuration;
+  }
+
+  @Bean
+  @ConditionalOnMissingBean({ConnectionProvider.class})
+  public DataSourceConnectionProvider dataSourceConnectionProvider(DataSource dataSource) {
+    return new DataSourceConnectionProvider(new TransactionAwareDataSourceProxy(dataSource));
+  }
 }
+
