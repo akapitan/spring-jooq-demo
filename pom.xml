@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-parent</artifactId>
+    <version>2.5.6</version>
+    <relativePath/> <!-- lookup parent from repository -->
+  </parent>
+  <groupId>com.akapitan.demo</groupId>
+  <artifactId>spirng-jooq-ddd</artifactId>
+  <version>0.0.1-SNAPSHOT</version>
+  <name>spirng-jooq-ddd</name>
+  <description>spirng-jooq-ddd</description>
+  <properties>
+    <java.version>17</java.version>
+  </properties>
+  <dependencies>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-actuator</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-jooq</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-web</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.postgresql</groupId>
+      <artifactId>postgresql</artifactId>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-test</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.liquibase</groupId>
+      <artifactId>liquibase-core</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.testcontainers</groupId>
+      <artifactId>postgresql</artifactId>
+      <version>1.16.2</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.springframework.cloud</groupId>
+      <artifactId>spring-cloud-starter-bootstrap</artifactId>
+      <version>3.0.4</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.assertj</groupId>
+      <artifactId>assertj-core</artifactId>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-maven-plugin</artifactId>
+      </plugin>
+      <plugin>
+        <groupId>org.jooq</groupId>
+        <artifactId>jooq-codegen-maven</artifactId>
+        <version>3.14.13</version>
+        <dependencies>
+          <dependency>
+            <groupId>org.jooq</groupId>
+            <artifactId>jooq-meta-extensions-liquibase</artifactId>
+            <version>3.15.4</version>
+          </dependency>
+        </dependencies>
+        <executions>
+          <execution>
+            <id>generate-postgre</id>
+            <phase>generate-sources</phase>
+            <goals>
+              <goal>generate</goal>
+            </goals>
+            <configuration>
+
+              <jdbc>
+                <driver>org.postgresql.Driver</driver>
+                <url>jdbc:postgresql://localhost:5434/testdb</url>
+                <user>postgres</user>
+                <password>postgres</password>
+              </jdbc>
+              <generator>
+                <database>
+                  <!--                  <name>org.jooq.meta.extensions.liquibase.LiquibaseDatabase</name>-->
+                  <name>org.jooq.meta.postgres.PostgresDatabase</name>
+                  <properties>
+                    <!--
+                                        <property>
+                                          <key>scripts</key>
+                                          <value>src/main/resources/db.changelog/db.changelog-master.xml</value>
+                                        </property>
+                    -->
+                    <property>
+                      <key>includeLiquibaseTables</key>
+                      <value>false</value>
+                    </property>
+
+                    <property>
+                      <key>changeLogParameters.contexts</key>
+                      <value>!test</value>
+                    </property>
+                  </properties>
+
+                  <includes>.*</includes>
+                  <excludes>Database*</excludes>
+                  <inputSchema>public</inputSchema>
+                </database>
+                <generate>
+                  <!--                  <pojos>true</pojos>-->
+                  <!--
+                                    <pojosEqualsAndHashCode>
+                                      true
+                                    </pojosEqualsAndHashCode>
+                  -->
+                  <javaTimeTypes>true</javaTimeTypes>
+                  <fluentSetters>true</fluentSetters>
+                </generate>
+                <target>
+                  <packageName>
+                    com.akapitan.demo.springjooqddd.domain
+                  </packageName>
+                  <directory>
+                    target/generated-sources/jooq
+                  </directory>
+                </target>
+              </generator>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+</project>
