@@ -9,6 +9,7 @@ import com.zaxxer.hikari.HikariDataSource;
 import javax.sql.DataSource;
 import org.jooq.ConnectionProvider;
 import org.jooq.ExecuteListenerProvider;
+import org.jooq.conf.Settings;
 import org.jooq.impl.DataSourceConnectionProvider;
 import org.jooq.impl.DefaultConfiguration;
 import org.jooq.impl.DefaultDSLContext;
@@ -48,6 +49,7 @@ public class PostgreSqlContainerConfiguration {
 
   @Bean
   public DefaultDSLContext dslContext(org.jooq.Configuration configuration) {
+    new Settings().setExecuteLogging(false);
     return new DefaultDSLContext(configuration);
   }
 
@@ -61,12 +63,9 @@ public class PostgreSqlContainerConfiguration {
     configuration.set(properties.determineSqlDialect(dataSource));
     configuration.set(connectionProvider);
     configuration.set(
-        (ExecuteListenerProvider[]) executeListenerProviders.orderedStream().toArray((x$0) -> {
-          return new ExecuteListenerProvider[x$0];
-        }));
-    configurationCustomizers.orderedStream().forEach((customizer) -> {
-      customizer.customize(configuration);
-    });
+        executeListenerProviders.orderedStream().toArray(
+            ExecuteListenerProvider[]::new));
+    configurationCustomizers.orderedStream().forEach((customizer) -> customizer.customize(configuration));
     return configuration;
   }
 

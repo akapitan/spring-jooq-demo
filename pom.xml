@@ -62,6 +62,22 @@
       <groupId>org.assertj</groupId>
       <artifactId>assertj-core</artifactId>
     </dependency>
+<!--    Logging -->
+    <dependency>
+      <groupId>org.apache.logging.log4j</groupId>
+      <artifactId>log4j-api</artifactId>
+      <version>2.14.1</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.logging.log4j</groupId>
+      <artifactId>log4j-core</artifactId>
+      <version>2.14.1</version>
+    </dependency>
+    <dependency>
+      <groupId>ch.qos.logback</groupId>
+      <artifactId>logback-classic</artifactId>
+      <version>1.2.6</version>
+    </dependency>
   </dependencies>
 
   <build>
@@ -71,21 +87,21 @@
         <artifactId>liquibase-maven-plugin</artifactId>
         <version>4.6.1</version>
         <executions>
-<!--
-          <execution>
-            <phase>process-resources</phase>
-            <configuration>
-              <changeLogFile>src/main/resources/db.changelog/db.changelog-master.xml</changeLogFile>
-              <driver>org.postgresql.Driver</driver>
-              <url>jdbc:postgresql://localhost:5434/testdb</url>
-              <username>postgres</username>
-              <password>postgres</password>
-            </configuration>
-            <goals>
-              <goal>update</goal>
-            </goals>
-          </execution>
--->
+          <!--
+                    <execution>
+                      <phase>process-resources</phase>
+                      <configuration>
+                        <changeLogFile>src/main/resources/db.changelog/db.changelog-master.xml</changeLogFile>
+                        <driver>org.postgresql.Driver</driver>
+                        <url>jdbc:postgresql://localhost:5434/testdb</url>
+                        <username>postgres</username>
+                        <password>postgres</password>
+                      </configuration>
+                      <goals>
+                        <goal>update</goal>
+                      </goals>
+                    </execution>
+          -->
         </executions>
       </plugin>
       <plugin>

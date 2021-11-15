@@ -37,15 +37,13 @@ public class MinionRepository {
     if (minion.getId() == null) {
       minion.setId(UUID.randomUUID());
       minion.setVersion(0);
-      return dsl.insertInto(MINION, MINION.ID, MINION.VERSION, MINION.NAME, MINION.NUMBER_OF_EYES)
-          .values(minion.getId(), minion.getVersion(), minion.getName(), minion.getNumberOfEyes())
+      return dsl.insertInto(MINION, MINION.ID, MINION.VERSION, MINION.NAME, MINION.NUMBER_OF_EYES, MINION.EVIL_MASTER,MINION.DESCRIPTION)
+          .values(minion.getId(), minion.getVersion(), minion.getName(), minion.getNumberOfEyes(), minion.getEvilMaster(), minion.getDescription())
           .returning()
           .fetchOne();
     }
     minion.setVersion(minion.getVersion() + 1);
-    dsl.update(MINION).set(minion).execute();
-
-    return dsl.fetchOne(MINION, MINION.ID.eq(minion.getId()));
-
+//    minion.store();
+    return dsl.update(MINION).set(minion).where(MINION.ID.eq(minion.getId())).returning().fetchOne();
   }
 }
